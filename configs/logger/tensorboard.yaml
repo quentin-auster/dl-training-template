@@ -1,0 +1,5 @@
+# @package logger
+_target_: lightning.pytorch.loggers.TensorBoardLogger
+save_dir: ${run.save_dir}
+name: ${run.name}
+default_hp_metric: false

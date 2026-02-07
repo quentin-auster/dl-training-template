@@ -1,0 +1,13 @@
+# @package trainer
+_target_: lightning.pytorch.Trainer
+accelerator: gpu
+devices: 2                 # override at CLI: trainer.devices=4
+strategy: ddp
+max_epochs: 10
+log_every_n_steps: 50
+enable_checkpointing: true
+enable_progress_bar: true
+deterministic: false
+# optional later:
+# sync_batchnorm: true
+# precision: bf16-mixed

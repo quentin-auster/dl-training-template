@@ -1,0 +1,11 @@
+# @package callbacks
+- _target_: lightning.pytorch.callbacks.ModelCheckpoint
+  dirpath: null          # let Trainer/Logger decide or set from code to run dir
+  filename: "epoch{epoch:02d}-step{step}"
+  save_last: true
+  save_top_k: 1
+  monitor: "val_loss"
+  mode: "min"
+
+- _target_: lightning.pytorch.callbacks.LearningRateMonitor
+  logging_interval: "step"
