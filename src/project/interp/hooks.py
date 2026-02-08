@@ -6,7 +6,7 @@ This module re-exports key utilities and adds convenience helpers.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Sequence, cast
 
 import torch
 from torch import Tensor
@@ -54,11 +54,13 @@ def get_cache(
         logits, cache = get_cache(model, input_ids)
         attn_pattern = cache["blocks.0.attn.hook_attn_pattern"]
     """
-    return model.run_with_cache(
+    result = model.run_with_cache(
         input_ids,
         names_filter=names_filter,
         **forward_kwargs,
     )
+    logits, cache = result
+    return cast(Tensor, logits), cast(ActivationCache, cache)
 
 
 def get_activation(
