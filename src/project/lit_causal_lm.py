@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 import lightning as L
 from torch import Tensor
+from lightning.pytorch.utilities.types import OptimizerLRScheduler
 
 log = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ class LitCausalLM(L.LightningModule):
         self.print(msg)
         log.info(msg)
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> OptimizerLRScheduler:
         optimizer = torch.optim.AdamW(
             self.parameters(), lr=self.lr, weight_decay=self.weight_decay,
         )

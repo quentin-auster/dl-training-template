@@ -17,6 +17,7 @@ dependencies = [
     "matplotlib>=3.8",
     "datasets>=4.5.0",
     "tensorboard>=2.20.0",
+    "jupyterlab>=4.5.3",
 ]
 
 [build-system]
