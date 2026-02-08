@@ -1,9 +1,12 @@
 # @package data
-# Nanda grokking setup: all p^2 pairs, 30% train split
+# Nanda grokking setup: all p^2 pairs, 30% train, 3-token context (a b =)
 _target_: project.data.lit_data.ModularAdditionDataModule
 modulus: 113
 frac_train: 0.3
 answer_only_supervision: true
-batch_size: 512
+include_bos: false
+include_eos: false
+use_plus: false
+batch_size: 4096      # full-batch (113^2 * 0.3 ≈ 3831 train pairs)
 num_workers: 0
 seed: 0

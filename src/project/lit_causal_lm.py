@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 import lightning as L
 from torch import Tensor
+from typing import Sequence
 from lightning.pytorch.utilities.types import OptimizerLRScheduler
 
 log = logging.getLogger(__name__)
@@ -29,9 +30,12 @@ class LitCausalLM(L.LightningModule):
         d_mlp: int | None = None,
         max_seq_len: int = 64,
         dropout: float = 0.0,
+        activation: str = "gelu",
         tie_embed: bool = True,
+        use_ln: bool = True,
         lr: float = 1e-3,
         weight_decay: float = 0.1,
+        betas: Sequence[float] = (0.9, 0.999),
         warmup_steps: int = 100,
     ) -> None:
         super().__init__()
@@ -45,10 +49,13 @@ class LitCausalLM(L.LightningModule):
             d_mlp=d_mlp,
             max_seq_len=max_seq_len,
             dropout=dropout,
+            activation=activation,
             tie_embed=tie_embed,
+            use_ln=use_ln,
         )
         self.lr = lr
         self.weight_decay = weight_decay
+        self.betas: tuple[float, float] = (betas[0], betas[1])
         self.warmup_steps = warmup_steps
 
     def forward(self, input_ids: Tensor, attention_mask: Tensor | None = None) -> Tensor:
@@ -110,6 +117,7 @@ class LitCausalLM(L.LightningModule):
     def configure_optimizers(self) -> OptimizerLRScheduler:
         optimizer = torch.optim.AdamW(
             self.parameters(), lr=self.lr, weight_decay=self.weight_decay,
+            betas=self.betas,
         )
         # Linear warmup then constant LR — simple and effective for small models.
         def lr_lambda(step: int) -> float:

@@ -22,6 +22,7 @@ class ModularAdditionConfig:
     n_terms: int = 2
     include_bos: bool = True
     include_eos: bool = True
+    use_plus: bool = True
     # If True, only supervise the answer position (after "=").
     # If False, supervise next-token everywhere (standard causal LM shift).
     answer_only_supervision: bool = True
@@ -31,12 +32,16 @@ def _sample_terms(rng: random.Random, modulus: int, n_terms: int) -> List[int]:
     return [rng.randrange(modulus) for _ in range(n_terms)]
 
 
-def _build_expression_tokens(terms: List[int]) -> List[str]:
-    """[3, 7, 2] -> ["3", "+", "7", "+", "2", "="]"""
+def _build_expression_tokens(terms: List[int], use_plus: bool = True) -> List[str]:
+    """Build token list from terms.
+
+    With use_plus=True:  [3, 7] -> ["3", "+", "7", "="]
+    With use_plus=False: [3, 7] -> ["3", "7", "="]  (Nanda style)
+    """
     toks: List[str] = []
     for i, a in enumerate(terms):
         toks.append(str(a))
-        if i < len(terms) - 1:
+        if use_plus and i < len(terms) - 1:
             toks.append("+")
     toks.append("=")
     return toks
@@ -50,7 +55,7 @@ def _encode_pair(
     toks: List[str] = []
     if cfg.include_bos:
         toks.append("<BOS>")
-    toks.extend(_build_expression_tokens([a, b]))
+    toks.extend(_build_expression_tokens([a, b], use_plus=cfg.use_plus))
     toks.append(str(ans))
     if cfg.include_eos:
         toks.append("<EOS>")

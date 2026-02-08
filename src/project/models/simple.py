@@ -138,7 +138,7 @@ class MLP(nn.Module):
 
 
 class TransformerBlock(nn.Module):
-    """Transformer block with pre-norm and HookPoints."""
+    """Transformer block with optional pre-norm and HookPoints."""
 
     def __init__(
         self,
@@ -147,11 +147,13 @@ class TransformerBlock(nn.Module):
         d_mlp: int | None = None,
         dropout: float = 0.0,
         activation: str = "gelu",
+        use_ln: bool = True,
     ) -> None:
         super().__init__()
-        self.ln1 = nn.LayerNorm(d_model)
+        self.use_ln = use_ln
+        self.ln1 = nn.LayerNorm(d_model) if use_ln else nn.Identity()
         self.attn = Attention(d_model, n_heads, dropout)
-        self.ln2 = nn.LayerNorm(d_model)
+        self.ln2 = nn.LayerNorm(d_model) if use_ln else nn.Identity()
         self.mlp = MLP(d_model, d_mlp, dropout, activation)
 
         # HookPoints for residual stream
@@ -214,6 +216,7 @@ class TinyTransformer(HookedRootModule):
         dropout: float = 0.0,
         activation: str = "gelu",
         tie_embed: bool = True,
+        use_ln: bool = True,
     ) -> None:
         super().__init__()
 
@@ -234,12 +237,12 @@ class TinyTransformer(HookedRootModule):
 
         # Transformer blocks
         self.blocks = nn.ModuleList([
-            TransformerBlock(d_model, n_heads, d_mlp, dropout, activation)
+            TransformerBlock(d_model, n_heads, d_mlp, dropout, activation, use_ln)
             for _ in range(n_layers)
         ])
 
         # Output
-        self.ln_final = nn.LayerNorm(d_model)
+        self.ln_final = nn.LayerNorm(d_model) if use_ln else nn.Identity()
         self.unembed = nn.Linear(d_model, vocab_size, bias=False)
 
         if tie_embed:

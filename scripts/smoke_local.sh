@@ -9,9 +9,13 @@
 # Good default for any script that shouldn't keep running after something goes wrong.
 set -euo pipefail
 
-# Quick smoke test: Nanda grokking setup, 20 epochs on MPS
+# Nanda grokking setup on MPS.
+# Grokking typically happens around epoch 1000-3000.
+# Use Ctrl-C to stop early; checkpoints are saved periodically.
 uv run python -m project.train.run \
     data=modular \
     model=causal_lm \
     trainer=mps \
-    trainer.max_epochs=20
+    trainer.max_epochs=20 \
+    trainer.log_every_n_steps=1 \
+    "$@"

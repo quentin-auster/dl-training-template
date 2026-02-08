@@ -23,7 +23,10 @@ class ModularAdditionDataModule(L.LightningDataModule):
         modulus: int = 113,
         frac_train: float = 0.3,
         answer_only_supervision: bool = True,
-        batch_size: int = 512,
+        include_bos: bool = False,
+        include_eos: bool = False,
+        use_plus: bool = False,
+        batch_size: int = 4096,
         num_workers: int = 0,
         seed: int = 0,
     ) -> None:
@@ -34,6 +37,9 @@ class ModularAdditionDataModule(L.LightningDataModule):
         self.cfg = ModularAdditionConfig(
             modulus=modulus,
             answer_only_supervision=answer_only_supervision,
+            include_bos=include_bos,
+            include_eos=include_eos,
+            use_plus=use_plus,
         )
         self.frac_train = frac_train
         self.batch_size = batch_size
@@ -56,6 +62,7 @@ class ModularAdditionDataModule(L.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
+            # persistent_workers=True,
             collate_fn=partial(causal_lm_collate, pad_id=self.vocab.pad_id),
         )
 
@@ -65,5 +72,6 @@ class ModularAdditionDataModule(L.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.num_workers,
+            # persistent_workers=True,
             collate_fn=partial(causal_lm_collate, pad_id=self.vocab.pad_id),
         )
