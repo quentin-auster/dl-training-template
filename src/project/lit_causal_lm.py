@@ -11,7 +11,7 @@ from lightning.pytorch.utilities.types import OptimizerLRScheduler
 
 log = logging.getLogger(__name__)
 
-from .models.simple import TinyTransformer
+from .models.examples import TinyTransformer
 
 
 class LitCausalLM(L.LightningModule):

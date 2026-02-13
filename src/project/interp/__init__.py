@@ -2,7 +2,6 @@
 
 This module provides tools for understanding model internals:
 
-- hooks: Activation caching via TransformerLens
 - ablate: Zero/mean ablation to identify important components
 - patch: Activation patching for causal tracing
 - probes: Linear probes to test feature encoding
@@ -10,15 +9,12 @@ This module provides tools for understanding model internals:
 
 Example workflow:
     from project.models import TinyTransformer
-    from project.interp import get_cache, head_ablation_sweep, train_probe
+    from project.interp import head_ablation_sweep, train_probe
 
     model = TinyTransformer(vocab_size=100, d_model=64, n_layers=2, n_heads=4)
 
     # Cache activations
     logits, cache = model.run_with_cache(input_ids)
-
-    # Or use helpers
-    logits, cache = get_cache(model, input_ids)
 
     # Ablation study
     results = head_ablation_sweep(model, input_ids, loss_fn)
@@ -27,15 +23,6 @@ Example workflow:
     result = train_probe(cache["blocks.0.hook_resid_post"][:, -1], labels)
 """
 
-from project.interp.hooks import (
-    ActivationCache,
-    HookPoint,
-    HookedRootModule,
-    cache_subset,
-    get_activation,
-    get_cache,
-    list_hook_names,
-)
 from project.interp.ablate import (
     AblationResult,
     ablation_sweep,
@@ -69,14 +56,6 @@ from project.interp.viz import (
 )
 
 __all__ = [
-    # hooks (TransformerLens re-exports)
-    "ActivationCache",
-    "HookPoint",
-    "HookedRootModule",
-    "get_cache",
-    "get_activation",
-    "list_hook_names",
-    "cache_subset",
     # ablate
     "AblationResult",
     "ablation_sweep",
