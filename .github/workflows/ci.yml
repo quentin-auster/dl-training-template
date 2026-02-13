@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  smoke-train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run CPU smoke training
+        run: |
+          uv run python -m project.train.run \
+            model=causal_lm \
+            data=modular \
+            trainer=cpu \
+            trainer.max_epochs=1 \
+            data.batch_size=256 \
+            trainer.log_every_n_steps=1
