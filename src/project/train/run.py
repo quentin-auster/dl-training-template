@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import logging
 import os
+import subprocess
 from typing import Optional
 
 import hydra
@@ -11,6 +13,8 @@ import lightning as L
 from lightning.pytorch.loggers import Logger
 from lightning.pytorch.callbacks import Callback, ModelCheckpoint
 from hydra.utils import instantiate
+
+log = logging.getLogger(__name__)
 
 
 def _get_output_dir() -> str:
@@ -94,6 +98,34 @@ def main(cfg: DictConfig) -> None:
 
     # If you want a minimal "always test after fit" pattern, uncomment:
     # trainer.test(lit_module, datamodule=datamodule)
+
+    # Sync run directory to cloud storage via rclone (opt-in).
+    # Set RCLONE_DEST to enable, e.g. RCLONE_DEST=gdrive:training-runs
+    _sync_to_cloud(run_dir)
+
+
+def _sync_to_cloud(run_dir: str) -> None:
+    """Sync *run_dir* to cloud storage if ``RCLONE_DEST`` is set.
+
+    The directory is uploaded to ``$RCLONE_DEST/<run_dir_basename>/``.
+    Requires ``rclone`` to be installed and configured.
+    """
+    dest = os.environ.get("RCLONE_DEST")
+    if not dest:
+        return
+
+    remote_path = f"{dest.rstrip('/')}/{os.path.basename(run_dir)}"
+    log.info("Syncing %s -> %s", run_dir, remote_path)
+    try:
+        subprocess.run(
+            ["rclone", "sync", run_dir, remote_path, "--progress"],
+            check=True,
+        )
+        log.info("Cloud sync complete.")
+    except FileNotFoundError:
+        log.warning("rclone not found on PATH — skipping cloud sync.")
+    except subprocess.CalledProcessError as exc:
+        log.warning("rclone sync failed (exit %d) — run data is still in %s", exc.returncode, run_dir)
 
 
 if __name__ == "__main__":
