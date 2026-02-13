@@ -94,6 +94,54 @@ Example overriding number of GPUs:
 ./scripts/train_ddp.sh trainer.devices=4
 ```
 
+## VM / cloud setup
+
+For running on a cloud GPU instance (RunPod, Lambda, Vast.ai, GCP, etc.):
+
+```bash
+git clone <your-repo-url> && cd training-template
+./scripts/setup_vm.sh
+```
+
+This installs `uv`, `rclone`, and all Python dependencies. Then train as usual:
+
+```bash
+./scripts/train_gpu.sh
+```
+
+### Cloud sync with rclone
+
+Training runs can be automatically synced to cloud storage (Google Drive, S3, GCS, etc.) after each run. This is controlled by the `RCLONE_DEST` environment variable.
+
+One-time setup:
+
+```bash
+rclone config  # interactive — follow the OAuth flow for your provider
+```
+
+Then set `RCLONE_DEST` before training:
+
+```bash
+export RCLONE_DEST=gdrive:training-runs
+./scripts/train_gpu.sh
+```
+
+Each run directory is synced to `$RCLONE_DEST/<run_dir_name>/` after `trainer.fit()` completes. If `RCLONE_DEST` is not set, nothing happens.
+
+### Weights & Biases
+
+To log to W&B instead of TensorBoard, override the logger:
+
+```bash
+./scripts/train_gpu.sh logger=wandb logger.project=my-project
+```
+
+You can combine both cloud sync and W&B:
+
+```bash
+RCLONE_DEST=gdrive:training-runs ./scripts/train_gpu.sh logger=wandb logger.project=my-project
+```
+
 ## Logs, checkpoints, and outputs
 
 This project uses Hydra run directories under `outputs/`.
@@ -145,6 +193,9 @@ Useful knobs:
 
 - `src/project/train/run.py`: Hydra + Lightning training entrypoint
 - `src/project/lit_causal_lm.py`: LightningModule for causal LM
+- `src/project/models/examples.py`: TinyTransformer with HookPoints
 - `src/project/data/lit_data.py`: modular addition DataModule
+- `src/project/interp/`: mechanistic interpretability tools (ablation, patching, probes, viz)
+- `src/project/utils/helpers.py`: QoL helpers (`load_checkpoint`, `auto_device`, `to_numpy`, etc.)
 - `configs/`: Hydra configs (trainer/model/data/logger/callbacks)
-- `scripts/`: convenience launch scripts
+- `scripts/`: launch and setup scripts (`smoke_local.sh`, `train_gpu.sh`, `train_ddp.sh`, `setup_vm.sh`)
