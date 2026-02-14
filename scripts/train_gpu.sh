@@ -10,7 +10,7 @@
 #   ./scripts/train_gpu.sh trainer.max_epochs=2000  # override any Hydra param
 #
 # Monitor with TensorBoard:
-#   uv run tensorboard --logdir runs/
+#   uv run tensorboard --logdir outputs/
 
 set -euo pipefail
 

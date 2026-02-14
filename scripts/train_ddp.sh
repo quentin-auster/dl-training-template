@@ -12,7 +12,7 @@
 #   ./scripts/train_ddp.sh data.batch_size=1024        # override any Hydra param
 #
 # Monitor with TensorBoard:
-#   uv run tensorboard --logdir runs/
+#   uv run tensorboard --logdir outputs/
 
 set -euo pipefail
 

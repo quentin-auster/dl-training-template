@@ -158,12 +158,12 @@ Inside that run directory you will find:
 - `.hydra/` (Hydra config snapshots)
 - `checkpoints/` (Lightning checkpoints, via `ModelCheckpoint`)
 
-TensorBoard logs are written to `runs/` (via `configs/logger/tensorboard.yaml`).
+TensorBoard logs are written to `outputs/<date>/<time>/tb_logs/` alongside checkpoints and configs.
 
 Launch TensorBoard:
 
 ```bash
-uv run tensorboard --logdir runs/
+uv run tensorboard --logdir outputs/
 ```
 
 ## Common Hydra overrides

@@ -45,7 +45,7 @@ help:
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  clean_outputs    Remove Hydra output directories"
-	@echo "  clean_runs       Remove TensorBoard run logs"
+	@echo "  clean_runs       Remove old TensorBoard run logs (runs/)"
 	@echo "  clean            Remove both outputs and runs"
 	@echo ""
 	@echo "Variables: EPOCHS=$(EPOCHS)  DEVICES=$(DEVICES)"
@@ -91,7 +91,7 @@ train_ddp:
 # Polls for new data every 5 seconds.
 .PHONY: tensorboard
 tensorboard:
-	$(UV) run tensorboard --logdir runs/ --reload_interval 5
+	$(UV) run tensorboard --logdir outputs/ --reload_interval 5
 
 # ── Cleanup ──────────────────────────────────────────────────
 

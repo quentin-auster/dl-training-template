@@ -13,5 +13,8 @@ wheels/
 runs/*
 outputs/*
 
+# Jupyter
+.ipynb_checkpoints/
+
 # Secrets
 .env
