@@ -80,7 +80,7 @@ def main(cfg: DictConfig) -> None:
     # Point the logger's output into the Hydra run directory so that
     # checkpoints, configs, and TB/W&B logs all live together.
     if hasattr(logger, "_root_dir"):
-        logger._root_dir = os.path.join(run_dir, "tb_logs")
+        logger._root_dir = os.path.join(run_dir, "tb_logs")  # type: ignore[union-attr]
 
     callbacks = _instantiate_callbacks(cfg)
     _maybe_set_ckpt_dir(callbacks, ckpt_dir)
