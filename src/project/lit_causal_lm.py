@@ -57,60 +57,78 @@ class LitCausalLM(L.LightningModule):
         self.weight_decay = weight_decay
         self.betas: tuple[float, float] = (betas[0], betas[1])
         self.warmup_steps = warmup_steps
+        self._last_train_batch: dict[str, Tensor] | None = None
+        self._val_correct: int = 0
+        self._val_total: int = 0
+        self._val_loss_sum: float = 0.0
+        self._val_loss_count: int = 0
 
     def forward(self, input_ids: Tensor, attention_mask: Tensor | None = None) -> Tensor:
         return self.model(input_ids, attention_mask)
 
-    def _shared_step(self, batch: dict[str, Tensor], stage: str) -> Tensor:
-        # Reshape (B, T) -> (B, 1, 1, T) so it broadcasts over (B, n_heads, T, T) scores.
+    def _compute_metrics(
+        self, batch: dict[str, Tensor]
+    ) -> tuple[Tensor, Tensor, Tensor]:
+        """Forward pass and compute loss + accuracy on supervised positions."""
         attn_mask = batch["attn_mask"][:, None, None, :]
         logits = self(batch["input_ids"], attn_mask)  # (B, T, V)
-        # Flatten for cross-entropy: ignore_index=-100 handles masked positions.
         loss = F.cross_entropy(
             logits.view(-1, logits.size(-1)),
             batch["target_ids"].view(-1),
             ignore_index=-100,
         )
-        self.log(f"{stage}_loss", loss, prog_bar=True, on_step=(stage == "train"), on_epoch=True)
-
-        # Compute accuracy over supervised positions only.
         mask = batch["target_ids"] != -100
-        if mask.any():
-            preds = logits.argmax(dim=-1)
-            acc = (preds[mask] == batch["target_ids"][mask]).float().mean()
-            self.log(f"{stage}_acc", acc, prog_bar=True, on_step=(stage == "train"), on_epoch=True)
-
-        return loss
+        preds = logits.argmax(dim=-1)
+        acc = (preds[mask] == batch["target_ids"][mask]).float().mean()
+        return logits, loss, acc
 
     def training_step(self, batch: dict[str, Tensor], batch_idx: int) -> Tensor:
-        return self._shared_step(batch, "train")
+        self._last_train_batch = batch
+        _, loss, _ = self._compute_metrics(batch)
+        return loss
 
     def validation_step(self, batch: dict[str, Tensor], batch_idx: int) -> Tensor:
-        return self._shared_step(batch, "val")
+        logits, loss, _ = self._compute_metrics(batch)
+        # Accumulate counts for proper micro-averaged accuracy.
+        mask = batch["target_ids"] != -100
+        n_supervised = int(mask.sum().item())
+        preds = logits.argmax(dim=-1)
+        self._val_correct += int((preds[mask] == batch["target_ids"][mask]).sum().item())
+        self._val_total += n_supervised
+        self._val_loss_sum += loss.item() * n_supervised
+        self._val_loss_count += n_supervised
+        return loss
+
+    def on_validation_epoch_start(self) -> None:
+        self._val_correct = 0
+        self._val_total = 0
+        self._val_loss_sum = 0.0
+        self._val_loss_count = 0
 
     def on_train_epoch_end(self) -> None:
-        metrics = self.trainer.callback_metrics
-        loss = metrics.get("train_loss_epoch", metrics.get("train_loss"))
-        acc = metrics.get("train_acc_epoch", metrics.get("train_acc"))
-        parts = [f"Epoch {self.current_epoch}"]
-        if loss is not None:
-            parts.append(f"train_loss={loss:.4f}")
-        if acc is not None:
-            parts.append(f"train_acc={acc:.4f}")
-        msg = " | ".join(parts)
+        # Recompute train metrics with post-update weights so they're
+        # comparable to val metrics (which also run after the update).
+        batch = self._last_train_batch
+        if batch is None:
+            return
+        self.eval()
+        with torch.no_grad():
+            _, loss, acc = self._compute_metrics(batch)
+        self.train()
+        self.log("train_loss", loss, prog_bar=True, on_epoch=True)
+        self.log("train_acc", acc, prog_bar=True, on_epoch=True)
+        msg = f"Epoch {self.current_epoch} | train_loss={loss:.4f} | train_acc={acc:.4f}"
         self.print(msg)
         log.info(msg)
 
     def on_validation_epoch_end(self) -> None:
-        metrics = self.trainer.callback_metrics
-        loss = metrics.get("val_loss")
-        acc = metrics.get("val_acc")
-        if loss is None:
+        if self._val_total == 0:
             return
-        parts = [f"  val_loss={loss:.4f}"]
-        if acc is not None:
-            parts.append(f"val_acc={acc:.4f}")
-        msg = " | ".join(parts)
+        acc = self._val_correct / self._val_total
+        loss = self._val_loss_sum / self._val_loss_count
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_acc", acc, prog_bar=True)
+        msg = f"  val_loss={loss:.4f} | val_acc={acc:.4f}"
         self.print(msg)
         log.info(msg)
 

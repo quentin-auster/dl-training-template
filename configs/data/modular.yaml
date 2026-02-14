@@ -7,6 +7,6 @@ answer_only_supervision: true
 include_bos: false
 include_eos: false
 use_plus: false
-batch_size: 4096      # full-batch (113^2 * 0.3 ≈ 3831 train pairs)
+batch_size: 1024      # full-batch (113^2 * 0.3 ≈ 3831 train pairs)
 num_workers: 0
 seed: 0
