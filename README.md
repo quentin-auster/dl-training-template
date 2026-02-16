@@ -151,6 +151,8 @@ You can combine both cloud sync and W&B:
 RCLONE_DEST=gdrive:training-runs ./scripts/train_gpu.sh logger=wandb logger.project=my-project
 ```
 
+For information on rclone client id setup, see [here](https://rclone.org/drive/#making-your-own-client-id)
+
 ## Logs, checkpoints, and outputs
 
 This project uses Hydra run directories under `outputs/`.

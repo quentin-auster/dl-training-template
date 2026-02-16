@@ -55,11 +55,17 @@ def _maybe_set_ckpt_dir(callbacks: list[Callback], ckpt_dir: str) -> None:
                 cb.dirpath = ckpt_dir
 
 
-def _maybe_set_run_dir(callbacks: list[Callback], run_dir: str) -> None:
-    """Set run_dir on any RcloneSyncCallback that doesn't already have one."""
+def _maybe_set_sync_info(callbacks: list[Callback], run_dir: str,
+                         project: str | None, run_name: str | None) -> None:
+    """Set run_dir, project, and run_name on any RcloneSyncCallback."""
     for cb in callbacks:
-        if isinstance(cb, RcloneSyncCallback) and cb.run_dir is None:
-            cb.run_dir = run_dir
+        if isinstance(cb, RcloneSyncCallback):
+            if cb.run_dir is None:
+                cb.run_dir = run_dir
+            if cb.project is None:
+                cb.project = project
+            if cb.run_name is None:
+                cb.run_name = run_name
 
 
 def _instantiate_callbacks(cfg: DictConfig) -> list[Callback]:
@@ -117,9 +123,12 @@ def main(cfg: DictConfig) -> None:
     if hasattr(logger, "_root_dir"):
         logger._root_dir = os.path.join(run_dir, "tb_logs")  # type: ignore[union-attr]
 
+    project = cfg.get("run", {}).get("project")
+    run_name = cfg.run.name
+
     callbacks = _instantiate_callbacks(cfg)
     _maybe_set_ckpt_dir(callbacks, ckpt_dir)
-    _maybe_set_run_dir(callbacks, run_dir)
+    _maybe_set_sync_info(callbacks, run_dir, project, run_name)
 
     # Trainer: our trainer/*.yaml contains a lightning.pytorch.Trainer target
     trainer = instantiate(
@@ -141,7 +150,7 @@ def main(cfg: DictConfig) -> None:
 
     # Sync run directory to cloud storage via rclone (opt-in).
     # Set RCLONE_DEST to enable, e.g. RCLONE_DEST=gdrive:training-runs
-    sync_to_cloud(run_dir)
+    sync_to_cloud(run_dir, project, run_name)
 
 
 if __name__ == "__main__":
