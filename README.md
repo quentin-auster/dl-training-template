@@ -130,11 +130,20 @@ Each run directory is synced to `$RCLONE_DEST/<run_dir_name>/` after `trainer.fi
 
 ### Weights & Biases
 
-To log to W&B instead of TensorBoard, override the logger:
+1. Get your API key from [wandb.ai/authorize](https://wandb.ai/authorize).
+2. Add it to a `.env` file in the project root (already in `.gitignore`):
 
-```bash
-./scripts/train_gpu.sh logger=wandb logger.project=my-project
-```
+   ```
+   WANDB_API_KEY=your_key_here
+   ```
+
+3. Run with the `wandb` logger:
+
+   ```bash
+   ./scripts/train_gpu.sh logger=wandb logger.project=my-project
+   ```
+
+The API key is loaded automatically from `.env` via `python-decouple` whenever `logger=wandb` is set. You can also update the default project name in `configs/logger/wandb.yaml`.
 
 You can combine both cloud sync and W&B:
 

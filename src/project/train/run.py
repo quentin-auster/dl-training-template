@@ -5,6 +5,7 @@ import os
 import subprocess
 from typing import Optional
 
+from decouple import config as decouple_config
 import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
@@ -59,6 +60,12 @@ def _instantiate_logger(cfg: DictConfig) -> Optional[Logger]:
 def main(cfg: DictConfig) -> None:
     # Make config visible in logs/artifacts
     OmegaConf.set_struct(cfg, False)
+
+    # Load W&B API key from .env when using the wandb logger.
+    if cfg.get("logger", {}).get("_target_", "").endswith("WandbLogger"):
+        wandb_key = str(decouple_config("WANDB_API_KEY", default=""))
+        if wandb_key:
+            os.environ["WANDB_API_KEY"] = wandb_key
 
     # Reproducibility: seed everything (Lightning handles DDP-safe seeding)
     seed = int(cfg.get("seed", 123))

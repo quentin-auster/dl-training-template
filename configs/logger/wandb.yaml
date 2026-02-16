@@ -1,6 +1,6 @@
 # @package logger
 _target_: lightning.pytorch.loggers.WandbLogger
-project: your_project_name
+project: modular-addition
 name: ${run.name}
 save_dir: ${run.save_dir}
 log_model: false
