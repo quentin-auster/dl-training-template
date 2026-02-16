@@ -113,20 +113,26 @@ This installs `uv`, `rclone`, and all Python dependencies. Then train as usual:
 
 Training runs can be automatically synced to cloud storage (Google Drive, S3, GCS, etc.) after each run. This is controlled by the `RCLONE_DEST` environment variable.
 
-One-time setup:
+One-time setup (on a machine with a browser):
 
 ```bash
 rclone config  # interactive — follow the OAuth flow for your provider
 ```
 
-Then set `RCLONE_DEST` before training:
+For headless VMs, add your rclone config to `.env` so `setup_vm.sh` configures it automatically:
 
-```bash
-export RCLONE_DEST=gdrive:training-runs
-./scripts/train_gpu.sh
+```
+RCLONE_CONF_B64="<output of: base64 < ~/.config/rclone/rclone.conf>"
+RCLONE_DEST="gdrive:training-runs"
 ```
 
-Each run directory is synced to `$RCLONE_DEST/<run_dir_name>/` after `trainer.fit()` completes. If `RCLONE_DEST` is not set, nothing happens.
+Then train with `run.project` to organize uploads by project:
+
+```bash
+./scripts/train_gpu.sh run.project=modular-addition
+```
+
+Each run syncs to `$RCLONE_DEST/<project>/run_artifacts/<run_name>/` both periodically during training (every 50 epochs by default) and after `trainer.fit()` completes. If `RCLONE_DEST` is not set, nothing happens.
 
 ### Weights & Biases
 
@@ -197,6 +203,7 @@ Useful knobs:
 - `trainer.devices=<int>` (for DDP)
 - `trainer.precision=16-mixed|bf16-mixed|32`
 - `data.batch_size=<int>`
+- `run.project=<str>` (required for cloud sync folder structure)
 - `run.name=<str>`
 - `seed=<int>`
 

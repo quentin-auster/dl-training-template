@@ -71,4 +71,4 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 
 ## Cloud sync
 
-Set `RCLONE_DEST=gdrive:training-runs` (or any rclone remote) to auto-sync run directories after training. W&B via `logger=wandb logger.project=...`.
+Set `RCLONE_DEST=gdrive:training-runs` (or any rclone remote) + `run.project=<name>` to sync to `RCLONE_DEST/<project>/run_artifacts/<run_name>/`. Syncs periodically (every 50 epochs via `RcloneSyncCallback`) and after `trainer.fit()`. Headless VMs: set `RCLONE_CONF_B64` in `.env` for auto-config. W&B via `logger=wandb logger.project=...`.
