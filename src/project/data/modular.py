@@ -66,7 +66,7 @@ def _encode_pair(
     if cfg.answer_only_supervision:
         eq_pos = x.index(eq_id)
         y = [-100] * len(x)
-        y[eq_pos + 1] = x[eq_pos + 1]
+        y[eq_pos] = x[eq_pos + 1]
     else:
         y = x[1:] + [-100]
 
