@@ -159,6 +159,31 @@ RCLONE_DEST=gdrive:training-runs ./scripts/train_gpu.sh logger=wandb logger.proj
 
 For information on rclone client id setup, see [here](https://rclone.org/drive/#making-your-own-client-id)
 
+## Resuming from a checkpoint
+
+To resume a training run from a saved checkpoint, pass `run.ckpt_path`:
+
+```bash
+uv run python -m project.train.run \
+  model=causal_lm data=modular trainer=mps \
+  trainer.max_epochs=3000 \
+  run.ckpt_path=/path/to/last.ckpt
+```
+
+This restores model weights, optimizer state, epoch counter, and LR scheduler. Checkpoints are saved locally in the Hydra output directory and synced to GDrive (if configured). To resume from a GDrive checkpoint, pull it down first with `rclone copy`.
+
+## Adaptive log frequency
+
+`LitCausalLM` supports adaptive logging to reduce noise during long runs. By default, metrics are logged to W&B/TensorBoard every 10 epochs for the first 100 epochs, then every 100 epochs after that. Console output is always printed regardless.
+
+Control via Hydra overrides on the model config:
+
+- `model.log_every_n_epochs_phase1=10` — log interval for early training
+- `model.log_every_n_epochs_phase2=100` — log interval after the boundary
+- `model.log_phase_boundary=100` — epoch where the transition happens
+
+Since `ModelCheckpoint` monitors `val_loss`, checkpoints are only saved at logged epochs.
+
 ## Logs, checkpoints, and outputs
 
 This project uses Hydra run directories under `outputs/`.
@@ -205,6 +230,10 @@ Useful knobs:
 - `data.batch_size=<int>`
 - `run.project=<str>` (required for cloud sync folder structure)
 - `run.name=<str>`
+- `run.ckpt_path=<path>` (resume from checkpoint)
+- `model.log_every_n_epochs_phase1=<int>` (default 10)
+- `model.log_every_n_epochs_phase2=<int>` (default 100)
+- `model.log_phase_boundary=<int>` (default 100)
 - `seed=<int>`
 
 ## Project layout

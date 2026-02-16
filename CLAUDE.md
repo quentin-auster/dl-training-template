@@ -13,6 +13,13 @@ uv run python -m project.train.run trainer=cpu model=causal_lm data=modular trai
 ./scripts/setup_vm.sh            # VM setup (installs uv, rclone, deps)
 ```
 
+### Resuming a run
+```bash
+uv run python -m project.train.run model=causal_lm data=modular trainer=mps \
+  run.ckpt_path=/path/to/last.ckpt trainer.max_epochs=3000
+```
+Restores model weights, optimizer state, epoch counter, and LR scheduler from a Lightning checkpoint.
+
 ## Key architecture
 
 - **Training**: Hydra config → `train/run.py` → instantiates LitCausalLM + DataModule → `trainer.fit()`
@@ -22,7 +29,7 @@ uv run python -m project.train.run trainer=cpu model=causal_lm data=modular trai
 ## Source map (`src/project/`)
 
 ### `lit_causal_lm.py`
-LitCausalLM — Lightning wrapper. Handles loss (cross_entropy, ignore_index=-100), accuracy on supervised positions, AdamW + linear warmup. Imports TinyTransformer from `models.examples`.
+LitCausalLM — Lightning wrapper. Handles loss (cross_entropy, ignore_index=-100), accuracy on supervised positions, AdamW + linear warmup. Imports TinyTransformer from `models.examples`. Supports adaptive log frequency via `log_every_n_epochs_phase1` (default 10), `log_every_n_epochs_phase2` (default 100), `log_phase_boundary` (default 100) — metrics are only logged to W&B/TB on matching epochs, which also gates ModelCheckpoint saves. Console output is always emitted.
 
 ### `models/examples.py`
 TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all with HookPoints. Hook names follow pattern: `blocks.{i}.attn.hook_{q,k,v,attn_scores,attn_pattern,z,result}`, `blocks.{i}.mlp.hook_{pre,post,result}`, `blocks.{i}.hook_resid_{pre,mid,post}`, `hook_embed`, `hook_pos_embed`, `hook_resid_final`.
@@ -34,7 +41,7 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 - `lit_data.py` — `ModularAdditionDataModule` (Lightning DataModule)
 
 ### `train/`
-- `run.py` — Hydra entrypoint (`@hydra.main`). Seeds, instantiates components, fits, syncs to cloud via `RCLONE_DEST`.
+- `run.py` — Hydra entrypoint (`@hydra.main`). Seeds, instantiates components, fits, syncs to cloud via `RCLONE_DEST`. Supports `run.ckpt_path` to resume from a Lightning checkpoint.
 - `loop.py` — Generic `train_epoch`, `eval_epoch` (placeholder, unused — Lightning handles training)
 - `losses.py` — `LOSSES` registry dict, `get_loss`, `register_loss` (placeholder)
 - `metrics.py` — `METRICS` registry dict, `get_metric`, `register_metric` (placeholder)
@@ -63,7 +70,7 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 - `optim/adamw.yaml` — placeholder (lr, wd, betas)
 - `trainer/{cpu,mps,gpu_1,ddp}.yaml` — Lightning Trainer configs
 - `logger/{tensorboard,wandb}.yaml` — logger configs
-- `callbacks/default.yaml` — ModelCheckpoint (save_last, monitor val_loss) + LearningRateMonitor
+- `callbacks/default.yaml` — ModelCheckpoint (save_last, save_top_k=3, monitor val_loss) + LearningRateMonitor + RcloneSyncCallback
 
 ## Notebooks
 

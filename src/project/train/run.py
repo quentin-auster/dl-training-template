@@ -143,7 +143,8 @@ def main(cfg: DictConfig) -> None:
         f.write(OmegaConf.to_yaml(cfg, resolve=True))
 
     # Fit (and optionally test)
-    trainer.fit(lit_module, datamodule=datamodule)
+    ckpt_path = cfg.get("run", {}).get("ckpt_path")
+    trainer.fit(lit_module, datamodule=datamodule, ckpt_path=ckpt_path)
 
     # If you want a minimal "always test after fit" pattern, uncomment:
     # trainer.test(lit_module, datamodule=datamodule)
