@@ -15,7 +15,22 @@ from lightning.pytorch.loggers import Logger
 from lightning.pytorch.callbacks import Callback, ModelCheckpoint
 from hydra.utils import instantiate
 
+from wonderwords import RandomWord
+
 log = logging.getLogger(__name__)
+
+
+def _generate_run_name(cfg: DictConfig) -> str:
+    """Generate a run name like 'zesty-causal_lm-adamw-gpu_1'."""
+    adjective = RandomWord().word(include_parts_of_speech=["adjectives"])
+    choices = HydraConfig.get().runtime.choices
+    parts = [
+        adjective,
+        choices.get("model", "model"),
+        choices.get("optim", "optim"),
+        choices.get("trainer", "trainer"),
+    ]
+    return "-".join(parts)
 
 
 def _get_output_dir() -> str:
@@ -60,6 +75,11 @@ def _instantiate_logger(cfg: DictConfig) -> Optional[Logger]:
 def main(cfg: DictConfig) -> None:
     # Make config visible in logs/artifacts
     OmegaConf.set_struct(cfg, False)
+
+    # Auto-generate a descriptive run name if not provided.
+    if not cfg.get("run", {}).get("name"):
+        cfg.run.name = _generate_run_name(cfg)
+    log.info("Run name: %s", cfg.run.name)
 
     # Load W&B API key from .env when using the wandb logger.
     if cfg.get("logger", {}).get("_target_", "").endswith("WandbLogger"):
