@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import subprocess
 from typing import Optional
 
 from decouple import config as decouple_config
@@ -16,6 +15,8 @@ from lightning.pytorch.callbacks import Callback, ModelCheckpoint
 from hydra.utils import instantiate
 
 from wonderwords import RandomWord
+
+from project.train.callbacks import RcloneSyncCallback, sync_to_cloud
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +53,13 @@ def _maybe_set_ckpt_dir(callbacks: list[Callback], ckpt_dir: str) -> None:
             # Lightning uses dirpath=None to mean "default"; we override to be explicit & reproducible.
             if cb.dirpath is None:
                 cb.dirpath = ckpt_dir
+
+
+def _maybe_set_run_dir(callbacks: list[Callback], run_dir: str) -> None:
+    """Set run_dir on any RcloneSyncCallback that doesn't already have one."""
+    for cb in callbacks:
+        if isinstance(cb, RcloneSyncCallback) and cb.run_dir is None:
+            cb.run_dir = run_dir
 
 
 def _instantiate_callbacks(cfg: DictConfig) -> list[Callback]:
@@ -111,6 +119,7 @@ def main(cfg: DictConfig) -> None:
 
     callbacks = _instantiate_callbacks(cfg)
     _maybe_set_ckpt_dir(callbacks, ckpt_dir)
+    _maybe_set_run_dir(callbacks, run_dir)
 
     # Trainer: our trainer/*.yaml contains a lightning.pytorch.Trainer target
     trainer = instantiate(
@@ -132,31 +141,7 @@ def main(cfg: DictConfig) -> None:
 
     # Sync run directory to cloud storage via rclone (opt-in).
     # Set RCLONE_DEST to enable, e.g. RCLONE_DEST=gdrive:training-runs
-    _sync_to_cloud(run_dir)
-
-
-def _sync_to_cloud(run_dir: str) -> None:
-    """Sync *run_dir* to cloud storage if ``RCLONE_DEST`` is set.
-
-    The directory is uploaded to ``$RCLONE_DEST/<run_dir_basename>/``.
-    Requires ``rclone`` to be installed and configured.
-    """
-    dest = os.environ.get("RCLONE_DEST")
-    if not dest:
-        return
-
-    remote_path = f"{dest.rstrip('/')}/{os.path.basename(run_dir)}"
-    log.info("Syncing %s -> %s", run_dir, remote_path)
-    try:
-        subprocess.run(
-            ["rclone", "sync", run_dir, remote_path, "--progress"],
-            check=True,
-        )
-        log.info("Cloud sync complete.")
-    except FileNotFoundError:
-        log.warning("rclone not found on PATH — skipping cloud sync.")
-    except subprocess.CalledProcessError as exc:
-        log.warning("rclone sync failed (exit %d) — run data is still in %s", exc.returncode, run_dir)
+    sync_to_cloud(run_dir)
 
 
 if __name__ == "__main__":

@@ -9,3 +9,6 @@
 
 - _target_: lightning.pytorch.callbacks.LearningRateMonitor
   logging_interval: "step"
+
+- _target_: project.train.callbacks.RcloneSyncCallback
+  every_n_epochs: 50

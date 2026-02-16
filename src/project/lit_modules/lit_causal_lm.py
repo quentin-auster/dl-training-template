@@ -57,7 +57,10 @@ class LitCausalLM(L.LightningModule):
         self.weight_decay = weight_decay
         self.betas: tuple[float, float] = (betas[0], betas[1])
         self.warmup_steps = warmup_steps
-        self._last_train_batch: dict[str, Tensor] | None = None
+        self._train_correct: int = 0
+        self._train_total: int = 0
+        self._train_loss_sum: float = 0.0
+        self._train_loss_count: int = 0
         self._val_correct: int = 0
         self._val_total: int = 0
         self._val_loss_sum: float = 0.0
@@ -83,8 +86,14 @@ class LitCausalLM(L.LightningModule):
         return logits, loss, acc
 
     def training_step(self, batch: dict[str, Tensor], batch_idx: int) -> Tensor:
-        self._last_train_batch = batch
-        _, loss, _ = self._compute_metrics(batch)
+        logits, loss, _ = self._compute_metrics(batch)
+        mask = batch["target_ids"] != -100
+        n_supervised = int(mask.sum().item())
+        preds = logits.argmax(dim=-1)
+        self._train_correct += int((preds[mask] == batch["target_ids"][mask]).sum().item())
+        self._train_total += n_supervised
+        self._train_loss_sum += loss.item() * n_supervised
+        self._train_loss_count += n_supervised
         return loss
 
     def validation_step(self, batch: dict[str, Tensor], batch_idx: int) -> Tensor:
@@ -105,16 +114,17 @@ class LitCausalLM(L.LightningModule):
         self._val_loss_sum = 0.0
         self._val_loss_count = 0
 
+    def on_train_epoch_start(self) -> None:
+        self._train_correct = 0
+        self._train_total = 0
+        self._train_loss_sum = 0.0
+        self._train_loss_count = 0
+
     def on_train_epoch_end(self) -> None:
-        # Recompute train metrics with post-update weights so they're
-        # comparable to val metrics (which also run after the update).
-        batch = self._last_train_batch
-        if batch is None:
+        if self._train_total == 0:
             return
-        self.eval()
-        with torch.no_grad():
-            _, loss, acc = self._compute_metrics(batch)
-        self.train()
+        acc = self._train_correct / self._train_total
+        loss = self._train_loss_sum / self._train_loss_count
         self.log("train_loss", loss, prog_bar=True, on_epoch=True)
         self.log("train_acc", acc, prog_bar=True, on_epoch=True)
         msg = f"Epoch {self.current_epoch} | train_loss={loss:.4f} | train_acc={acc:.4f}"
