@@ -55,6 +55,8 @@ class ModularAdditionDataModule(L.LightningDataModule):
             vocab=self.vocab, cfg=self.cfg,
             frac_train=self.frac_train, split="val", seed=self.seed,
         )
+        assert set(self.train_ds.pairs).isdisjoint(set(self.val_ds.pairs))
+
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
