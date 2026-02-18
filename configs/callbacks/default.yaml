@@ -11,4 +11,4 @@
   logging_interval: "step"
 
 - _target_: project.train.callbacks.RcloneSyncCallback
-  every_n_epochs: 50
+  every_n_epochs: 200
