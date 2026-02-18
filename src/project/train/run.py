@@ -9,6 +9,8 @@ import hydra
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
 
+OmegaConf.register_new_resolver("add", lambda *args: sum(int(a) for a in args))
+
 import lightning as L
 from lightning.pytorch.loggers import Logger
 from lightning.pytorch.callbacks import Callback, ModelCheckpoint

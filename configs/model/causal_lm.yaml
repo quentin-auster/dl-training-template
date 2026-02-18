@@ -1,7 +1,7 @@
 # @package model
 # Nanda grokking setup: 1-layer, no LN, ReLU, untied embeddings
 _target_: project.lit_modules.lit_causal_lm.LitCausalLM
-vocab_size: 120    # 3 specials + 113 digits + 4 ops
+vocab_size: ${add:${data.modulus},7}  # 3 specials + modulus digits + 4 ops
 d_model: 128
 n_layers: 1
 n_heads: 4
