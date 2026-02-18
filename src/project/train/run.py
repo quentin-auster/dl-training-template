@@ -22,12 +22,18 @@ log = logging.getLogger(__name__)
 
 
 def _generate_run_name(cfg: DictConfig) -> str:
-    """Generate a run name like 'zesty-causal_lm-adamw-gpu_1'."""
+    """Generate a run name like 'zesty-causal_lm-p113-adamw-gpu_1'."""
     adjective = RandomWord().word(include_parts_of_speech=["adjectives"])
     choices = HydraConfig.get().runtime.choices
     parts = [
         adjective,
         choices.get("model", "model"),
+    ]
+    # Include modulus when using modular addition data.
+    modulus = cfg.get("data", {}).get("modulus")
+    if modulus is not None:
+        parts.append(f"p{modulus}")
+    parts += [
         choices.get("optim", "optim"),
         choices.get("trainer", "trainer"),
     ]
