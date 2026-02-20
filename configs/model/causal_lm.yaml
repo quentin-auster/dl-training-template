@@ -11,7 +11,7 @@ dropout: 0.0
 activation: relu
 tie_embed: false
 use_ln: false
-lr: 1e-3u
+lr: 1e-3
 weight_decay: 1.0
 betas: [0.9, 0.98]
 warmup_steps: 10
