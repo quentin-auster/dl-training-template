@@ -7,3 +7,4 @@ log_every_n_steps: 10
 enable_checkpointing: true
 enable_progress_bar: true
 deterministic: false
+gradient_clip_val: 1.0
