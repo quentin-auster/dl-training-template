@@ -226,9 +226,11 @@ class TinyTransformer(HookedRootModule):
         self.n_heads = n_heads
         self.d_head = d_model // n_heads
 
-        # Embeddings
+        # Embeddings (scaled init to match Nanda's grokking setup)
         self.embed_tokens = nn.Embedding(vocab_size, d_model)
         self.embed_pos = nn.Embedding(max_seq_len, d_model)
+        nn.init.normal_(self.embed_tokens.weight, std=d_model ** -0.5)
+        nn.init.normal_(self.embed_pos.weight, std=d_model ** -0.5)
         self.dropout = nn.Dropout(dropout)
 
         # HookPoints for embeddings
