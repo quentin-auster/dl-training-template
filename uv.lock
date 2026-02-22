@@ -3337,7 +3337,6 @@ source = { editable = "." }
 dependencies = [
     { name = "datasets" },
     { name = "hydra-core" },
-    { name = "jupyterlab" },
     { name = "lightning" },
     { name = "matplotlib" },
     { name = "numpy" },
@@ -3354,6 +3353,9 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+analysis = [
+    { name = "jupyterlab" },
+]
 dev = [
     { name = "pytest" },
 ]
@@ -3362,14 +3364,13 @@ dev = [
 requires-dist = [
     { name = "datasets", specifier = ">=4.5.0" },
     { name = "hydra-core", specifier = ">=1.3.2" },
-    { name = "jupyterlab", specifier = ">=4.5.3" },
     { name = "lightning", specifier = ">=2.4.0" },
     { name = "matplotlib", specifier = ">=3.8" },
-    { name = "numpy", specifier = ">=1.26" },
+    { name = "numpy", specifier = ">=1.26.4" },
     { name = "omegaconf", specifier = ">=2.3.0" },
     { name = "python-decouple", specifier = ">=3.8" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "tensorboard", specifier = ">=2.20.0" },
+    { name = "tensorboard", specifier = ">=2.19.0" },
     { name = "torch", specifier = ">=2.2" },
     { name = "torchinfo", specifier = ">=1.8.0" },
     { name = "tqdm", specifier = ">=4.66" },
@@ -3379,6 +3380,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+analysis = [{ name = "jupyterlab", specifier = ">=4.5.3" }]
 dev = [{ name = "pytest", specifier = ">=9.0.2" }]
 
 [[package]]

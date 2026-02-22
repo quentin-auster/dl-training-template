@@ -13,11 +13,10 @@ dependencies = [
     "wandb",
     "pyyaml>=6.0",
     "tqdm>=4.66",
-    "numpy>=1.26",
+    "numpy>=1.26.4",
     "matplotlib>=3.8",
     "datasets>=4.5.0",
-    "tensorboard>=2.20.0",
-    "jupyterlab>=4.5.3",
+    "tensorboard>=2.19.0",
     "torchinfo>=1.8.0",
     "python-decouple>=3.8",
     "wonderwords>=3.0.1",
@@ -36,4 +35,8 @@ where = ["src"]
 [dependency-groups]
 dev = [
     "pytest>=9.0.2",
+]
+
+analysis = [
+    "jupyterlab>=4.5.3",
 ]
