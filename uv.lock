@@ -576,7 +576,7 @@ wheels = [
 
 [[package]]
 name = "datasets"
-version = "4.5.0"
+version = "4.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
@@ -595,9 +595,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/bf/bb927bde63d649296c83e883171ae77074717c1b80fe2868b328bd0dbcbb/datasets-4.5.0.tar.gz", hash = "sha256:00c698ce1c2452e646cc5fad47fef39d3fe78dd650a8a6eb205bb45eb63cd500", size = 588384, upload-time = "2026-01-14T18:27:54.297Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/54/9359803da96bc65439a28fbb014dc2c90b7d4d8034a93b72362b0d40191f/datasets-4.4.2.tar.gz", hash = "sha256:9de16e415c4ba4713eac0493f7c7dc74f3aa21599297f00cc6ddab409cb7b24b", size = 586474, upload-time = "2025-12-19T15:03:09.129Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fc/d5/0d563ea3c205eee226dc8053cf7682a8ac588db8acecd0eda2b587987a0b/datasets-4.5.0-py3-none-any.whl", hash = "sha256:b5d7e08096ffa407dd69e58b1c0271c9b2506140839b8d99af07375ad31b6726", size = 515196, upload-time = "2026-01-14T18:27:52.419Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/b5/fefa518c809de7bced5cddb7c21c010da66fa2ae494bda96844a280cc6ce/datasets-4.4.2-py3-none-any.whl", hash = "sha256:6f5ef3417504d9cd663c71c1b90b9a494ff4c2076a2cd6a6e40ceee6ad95befc", size = 512268, upload-time = "2025-12-19T15:03:07.087Z" },
 ]
 
 [[package]]
@@ -3341,7 +3341,6 @@ dependencies = [
     { name = "hydra-core" },
     { name = "lightning" },
     { name = "matplotlib" },
-    { name = "numpy" },
     { name = "omegaconf" },
     { name = "python-decouple" },
     { name = "pyyaml" },
@@ -3349,6 +3348,20 @@ dependencies = [
     { name = "torch" },
     { name = "torchinfo" },
     { name = "tqdm" },
+    { name = "transformer-lens", version = "2.15.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
+    { name = "transformer-lens", version = "2.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "wandb" },
+    { name = "wonderwords" },
+]
+
+[package.optional-dependencies]
+colab = [
+    { name = "datasets" },
+    { name = "hydra-core" },
+    { name = "lightning" },
+    { name = "omegaconf" },
+    { name = "python-decouple" },
+    { name = "torchinfo" },
     { name = "transformer-lens", version = "2.15.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
     { name = "transformer-lens", version = "2.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
     { name = "wandb" },
@@ -3365,22 +3378,31 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "datasets", specifier = ">=4.5.0" },
-    { name = "hydra-core", specifier = ">=1.3.2" },
-    { name = "lightning", specifier = ">=2.4.0" },
+    { name = "datasets", specifier = ">=4.0" },
+    { name = "datasets", marker = "extra == 'colab'", specifier = ">=4.0" },
+    { name = "hydra-core", specifier = ">=1.3" },
+    { name = "hydra-core", marker = "extra == 'colab'", specifier = ">=1.3" },
+    { name = "lightning", specifier = ">=2.4" },
+    { name = "lightning", marker = "extra == 'colab'", specifier = ">=2.4" },
     { name = "matplotlib", specifier = ">=3.8" },
-    { name = "numpy", specifier = ">=2.0" },
-    { name = "omegaconf", specifier = ">=2.3.0" },
+    { name = "omegaconf", specifier = ">=2.3" },
+    { name = "omegaconf", marker = "extra == 'colab'", specifier = ">=2.3" },
     { name = "python-decouple", specifier = ">=3.8" },
+    { name = "python-decouple", marker = "extra == 'colab'", specifier = ">=3.8" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "tensorboard", specifier = ">=2.19.0" },
+    { name = "tensorboard", specifier = ">=2.15" },
     { name = "torch", specifier = ">=2.2" },
-    { name = "torchinfo", specifier = ">=1.8.0" },
-    { name = "tqdm", specifier = ">=4.66" },
-    { name = "transformer-lens", specifier = ">=2.15.4" },
-    { name = "wandb" },
-    { name = "wonderwords", specifier = ">=3.0.1" },
+    { name = "torchinfo", specifier = ">=1.8" },
+    { name = "torchinfo", marker = "extra == 'colab'", specifier = ">=1.8" },
+    { name = "tqdm", specifier = ">=4.0" },
+    { name = "transformer-lens", specifier = ">=2.15" },
+    { name = "transformer-lens", marker = "extra == 'colab'", specifier = ">=2.15" },
+    { name = "wandb", specifier = ">=0.18" },
+    { name = "wandb", marker = "extra == 'colab'", specifier = ">=0.18" },
+    { name = "wonderwords", specifier = ">=3.0" },
+    { name = "wonderwords", marker = "extra == 'colab'", specifier = ">=3.0" },
 ]
+provides-extras = ["colab"]
 
 [package.metadata.requires-dev]
 analysis = [{ name = "jupyterlab", specifier = ">=4.5.3" }]
