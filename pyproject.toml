@@ -22,8 +22,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Use in Colab: pip install "git+https://github.com/you/repo.git[colab]"
-# Skips torch/tensorboard/matplotlib/tqdm (pre-installed in Colab) to avoid conflicts.
+# Use in Colab: 
+# %pip install "training-template[colab] @ git+https://github.com/quentin-auster/dl-training-template.git"
 colab = [
     "hydra-core>=1.3",
     "omegaconf>=2.3",
