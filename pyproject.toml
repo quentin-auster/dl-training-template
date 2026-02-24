@@ -10,11 +10,11 @@ dependencies = [
     "omegaconf>=2.3",
     "lightning>=2.4",
     "torch>=2.2",
-    "transformer-lens>=2.15",
     "pyyaml>=6.0",
     "tqdm>=4.0",
     "python-decouple>=3.8",
     "wonderwords>=3.0",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]

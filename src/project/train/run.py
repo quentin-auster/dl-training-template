@@ -104,7 +104,7 @@ def main(cfg: DictConfig) -> None:
     log.info("Run name: %s", cfg.run.name)
 
     # Load W&B API key from .env when using the wandb logger.
-    if cfg.get("logger", {}).get("_target_", "").endswith("WandbLogger"):
+    if (cfg.get("logger") or {}).get("_target_", "").endswith("WandbLogger"):
         wandb_key = str(decouple_config("WANDB_API_KEY", default=""))
         if wandb_key:
             os.environ["WANDB_API_KEY"] = wandb_key
