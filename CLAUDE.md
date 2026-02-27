@@ -6,7 +6,7 @@ PyTorch Lightning + Hydra template for training small transformers, focused on m
 
 ```bash
 uv sync                          # install deps
-uv run python -m project.train.run trainer=cpu model=causal_lm data=modular trainer.max_epochs=1  # smoke test
+uv run python -m project.train.run trainer=cpu model=causal_lm data=modular logger=none trainer.max_epochs=1  # smoke test
 ./scripts/smoke_local.sh         # MPS smoke test (20 epochs)
 ./scripts/train_gpu.sh           # single CUDA GPU (1000 epochs, fp16)
 ./scripts/train_ddp.sh           # multi-GPU DDP (1000 epochs, bf16)
