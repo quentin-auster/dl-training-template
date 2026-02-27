@@ -119,6 +119,20 @@ One-time setup (on a machine with a browser):
 rclone config  # interactive — follow the OAuth flow for your provider
 ```
 
+For Google Drive, you can get the OAuth token JSON without a full rclone install by running:
+
+```bash
+rclone authorize drive
+```
+
+This opens a browser flow and prints a JSON token. When running `rclone config`, choose advanced config and paste the JSON when prompted for the token.
+
+Then base64-encode your finished config for use on the VM:
+
+```bash
+base64 < ~/.config/rclone/rclone.conf
+```
+
 For headless VMs, add your rclone config to `.env` so `setup_vm.sh` configures it automatically:
 
 ```
