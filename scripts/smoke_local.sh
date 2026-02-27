@@ -16,6 +16,7 @@ uv run python -m project.train.run \
     data=modular \
     model=causal_lm \
     trainer=mps \
+    logger=none \
     trainer.max_epochs=10 \
-    trainer.log_every_n_steps=1 
+    trainer.log_every_n_steps=1
     "$@"
