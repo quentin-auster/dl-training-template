@@ -45,7 +45,7 @@ class FourierLoggingCallback(Callback):
         # Digits start at id=3 (after <PAD>, <BOS>, <EOS>) — see data/tokenize.py
         digit_ids = list(range(3, 3 + self.modulus))
         embeds = (
-            pl_module.model.embed_tokens.weight[digit_ids]
+            pl_module.model.embed_tokens.weight[digit_ids]  # type: ignore[union-attr]
             .detach().cpu().float().numpy()
         )  # (modulus, d_model)
 
