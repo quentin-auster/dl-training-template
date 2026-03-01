@@ -152,7 +152,9 @@ def main(cfg: DictConfig) -> None:
 
     # Fit (and optionally test)
     ckpt_path = cfg.get("run", {}).get("ckpt_path")
-    trainer.fit(lit_module, datamodule=datamodule, ckpt_path=ckpt_path)
+    # weights_only=False needed because Lightning checkpoints contain OmegaConf
+    # objects which PyTorch 2.6+ blocks under the default weights_only=True.
+    trainer.fit(lit_module, datamodule=datamodule, ckpt_path=ckpt_path, weights_only=False)
 
     # If you want a minimal "always test after fit" pattern, uncomment:
     # trainer.test(lit_module, datamodule=datamodule)

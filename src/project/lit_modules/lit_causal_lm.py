@@ -37,9 +37,6 @@ class LitCausalLM(L.LightningModule):
         weight_decay: float = 0.1,
         betas: Sequence[float] = (0.9, 0.999),
         warmup_steps: int = 100,
-        log_every_n_epochs_phase1: int = 10,
-        log_every_n_epochs_phase2: int = 100,
-        log_phase_boundary: int = 100,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
@@ -68,18 +65,6 @@ class LitCausalLM(L.LightningModule):
         self._val_total: int = 0
         self._val_loss_sum: float = 0.0
         self._val_loss_count: int = 0
-        self.log_every_n_epochs_phase1 = log_every_n_epochs_phase1
-        self.log_every_n_epochs_phase2 = log_every_n_epochs_phase2
-        self.log_phase_boundary = log_phase_boundary
-
-    def _should_log_epoch(self) -> bool:
-        """Check whether metrics should be logged to the logger this epoch."""
-        epoch = self.current_epoch
-        if epoch == 0:
-            return True
-        if epoch <= self.log_phase_boundary:
-            return epoch % self.log_every_n_epochs_phase1 == 0
-        return epoch % self.log_every_n_epochs_phase2 == 0
 
     def forward(self, input_ids: Tensor, attention_mask: Tensor | None = None) -> Tensor:
         return self.model(input_ids, attention_mask)
@@ -140,21 +125,19 @@ class LitCausalLM(L.LightningModule):
             return
         acc = self._train_correct / self._train_total
         loss = self._train_loss_sum / self._train_loss_count
-        if self._should_log_epoch():
-            self.log("train_loss", loss, prog_bar=True, on_epoch=True)
-            self.log("train_acc", acc, prog_bar=True, on_epoch=True)
+        self.log("train_loss", loss, prog_bar=True, on_epoch=True)
+        self.log("train_acc", acc, prog_bar=True, on_epoch=True)
         msg = f"Epoch {self.current_epoch} | train_loss={loss:.4f} | train_acc={acc:.4f}"
         self.print(msg)
         log.info(msg)
 
     def on_validation_epoch_end(self) -> None:
-        if self._val_total == 0:
+        if self._val_total == 0 or self.trainer.sanity_checking:
             return
         acc = self._val_correct / self._val_total
         loss = self._val_loss_sum / self._val_loss_count
-        if self._should_log_epoch():
-            self.log("val_loss", loss, prog_bar=True)
-            self.log("val_acc", acc, prog_bar=True)
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_acc", acc, prog_bar=True)
         msg = f"  val_loss={loss:.4f} | val_acc={acc:.4f}"
         self.print(msg)
         log.info(msg)

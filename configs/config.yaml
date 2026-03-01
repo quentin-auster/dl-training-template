@@ -15,6 +15,7 @@ run:
   name: null                 # optional: override from CLI, e.g. run.name=exp1
   save_dir: runs
   ckpt_dir: checkpoints      # relative to run dir (your code can join these)
+  ckpt_path: null            # resume from checkpoint, e.g. run.ckpt_path=/path/to/last.ckpt
 
 # Lightning-specific "glue" params you may want outside Trainer
 precision: 32                # can override to 16-mixed or bf16-mixed on GPU
