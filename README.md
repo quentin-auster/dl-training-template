@@ -1,6 +1,13 @@
-# Training Template
+# Deep Learning Training Template
 
-A lightweight PyTorch Lightning + Hydra template for training small transformer models, with a working causal language modeling setup for modular addition (grokking-style experiments).
+A (relatively) lightweight template primarily using PyTorch Lightning + Hydra template for deep learning projects in a more structured fashion than Colab notebooks typically allow. 
+
+Any user can and should make changes to the `configs` directory in addition to the `src` directory. But there is some solid boilderplate code that hopefully reduces a bit of friction/activation energy needed to get new projects started up. 
+
+Additionally, for folks with Apple Silicon chips, you should be able to prototype smaller models locally before launching training jobs on VMs. Whether prototyping locally or on a VM, you also have the ability to save training artifacts to cloud providers rather than local/virtual storage, so you can access them later from, say, a Colab notebook meaent for analysis. In addition to these artifacts, you can log training metrics to WandB and/or Tensorboard projects. 
+
+This is still a work in progress. Feel free to reach out and contribute if you find it useful!
+
 
 ## Requirements
 
