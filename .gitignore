@@ -12,6 +12,7 @@ wheels/
 # Runs
 runs/*
 outputs/*
+lightning_logs/
 
 # Jupyter
 .ipynb_checkpoints/
