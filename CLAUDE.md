@@ -6,7 +6,7 @@ PyTorch Lightning + Hydra template for training small transformers, focused on m
 
 ```bash
 uv sync                          # install deps
-uv run python -m project.train.run trainer=cpu model=causal_lm data=modular logger=none trainer.max_epochs=1 run.project=smoke  # smoke test
+uv run python -m project.train.run trainer=cpu model=causal_lm data=modular logger=none trainer.max_epochs=1  # smoke test
 ./scripts/smoke_local.sh         # MPS smoke test (20 epochs)
 ./scripts/train_gpu.sh           # single CUDA GPU (1000 epochs, fp16)
 ./scripts/train_ddp.sh           # multi-GPU DDP (1000 epochs, bf16)
@@ -78,7 +78,7 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 
 ## Cloud sync
 
-Set `RCLONE_DEST=gdrive:training-runs` (or any rclone remote) + `run.project=<name>` to sync to `RCLONE_DEST/<project>/run_artifacts/<run_name>/`. Syncs periodically (every 50 epochs via `RcloneSyncCallback`) and after `trainer.fit()`. Headless VMs: set `RCLONE_CONF_B64` in `.env` for auto-config. W&B via `logger=wandb logger.project=...`.
+Set `RCLONE_DEST=gdrive:training-runs` (or any rclone remote) to enable cloud sync. **`run.project=<name>` is required when `RCLONE_DEST` is set** — the run will fail at startup with a clear error if it is missing. Artifacts are uploaded to `RCLONE_DEST/<project>/run_artifacts/<run_name>/`. Syncs periodically (every 50 epochs via `RcloneSyncCallback`) and after `trainer.fit()`. Headless VMs: set `RCLONE_CONF_B64` in `.env` for auto-config. W&B via `logger=wandb logger.project=...`.
 
 ## Docker
 

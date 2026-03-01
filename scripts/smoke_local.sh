@@ -19,5 +19,4 @@ uv run python -m project.train.run \
     logger=none \
     trainer.max_epochs=2 \
     trainer.log_every_n_steps=1 \
-    run.project=smoke \
     "$@"

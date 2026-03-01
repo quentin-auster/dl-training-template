@@ -132,6 +132,12 @@ def main(cfg: DictConfig) -> None:
         logger._root_dir = os.path.join(run_dir, "tb_logs")  # type: ignore[union-attr]
 
     project = cfg.get("run", {}).get("project")
+    rclone_dest = str(decouple_config("RCLONE_DEST", default=""))
+    if rclone_dest and not project:
+        raise ValueError(
+            "RCLONE_DEST is set but run.project is not. "
+            "Pass run.project=<name> to enable cloud sync."
+        )
     run_name = cfg.run.name
 
     callbacks = _instantiate_callbacks(cfg)
