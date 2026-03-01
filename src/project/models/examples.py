@@ -13,7 +13,7 @@ from typing import Optional
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
-from project.models.hook_points import HookPoint, HookedRootModule
+from project.interp.hook_points import HookPoint, HookedRootModule
 
 
 class Attention(nn.Module):

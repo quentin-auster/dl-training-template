@@ -11,7 +11,7 @@ from typing import Any, Callable, Literal
 
 import torch
 from torch import Tensor
-from project.models.hook_points import HookedRootModule
+from project.interp.hook_points import HookedRootModule
 
 
 @dataclass
