@@ -79,3 +79,11 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 ## Cloud sync
 
 Set `RCLONE_DEST=gdrive:training-runs` (or any rclone remote) + `run.project=<name>` to sync to `RCLONE_DEST/<project>/run_artifacts/<run_name>/`. Syncs periodically (every 50 epochs via `RcloneSyncCallback`) and after `trainer.fit()`. Headless VMs: set `RCLONE_CONF_B64` in `.env` for auto-config. W&B via `logger=wandb logger.project=...`.
+
+## Docker
+
+- `docker/Dockerfile` — CUDA 12.1 + Python 3.12 + uv + rclone; installs `[train]` extras from lockfile; default CMD is `./scripts/train_gpu.sh`
+- `docker/entrypoint.sh` — decodes `RCLONE_CONF_B64` env var into `~/.config/rclone/rclone.conf` before exec; same pattern as `setup_vm.sh`
+- `.dockerignore` — excludes `.venv/`, `outputs/`, `runs/`, `lightning_logs/`, `.env`, `*.ckpt`
+- Build: `docker build -f docker/Dockerfile -t training-template .`
+- Run with cloud sync: `docker run --gpus all -e RCLONE_CONF_B64=... -e RCLONE_DEST=gdrive:training-runs training-template`

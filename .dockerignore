@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+outputs/
+runs/
+lightning_logs/
+notebooks/
+.env
+*.ckpt

@@ -94,6 +94,48 @@ Example overriding number of GPUs:
 ./scripts/train_ddp.sh trainer.devices=4
 ```
 
+## Docker
+
+A `docker/Dockerfile` is provided for reproducible GPU training on any CUDA host without fighting driver or Python version mismatches.
+
+### Build
+
+```bash
+docker build -f docker/Dockerfile -t training-template .
+```
+
+### Run
+
+```bash
+docker run --gpus all training-template
+```
+
+This runs `./scripts/train_gpu.sh` by default (single GPU, 1000 epochs, fp16). Override the command to use a different script:
+
+```bash
+docker run --gpus all training-template ./scripts/train_ddp.sh
+```
+
+Or pass Hydra overrides directly:
+
+```bash
+docker run --gpus all training-template \
+  uv run python -m project.train.run \
+    model=causal_lm data=modular trainer=gpu_1 \
+    trainer.max_epochs=2000
+```
+
+### Cloud sync inside Docker
+
+Pass `RCLONE_CONF_B64` and `RCLONE_DEST` as environment variables — the entrypoint writes the rclone config automatically before training starts:
+
+```bash
+docker run --gpus all \
+  -e RCLONE_CONF_B64="$(base64 < ~/.config/rclone/rclone.conf)" \
+  -e RCLONE_DEST="gdrive:training-runs" \
+  training-template ./scripts/train_gpu.sh run.project=modular-addition
+```
+
 ## VM / cloud setup
 
 For running on a cloud GPU instance (RunPod, Lambda, Vast.ai, GCP, etc.):
