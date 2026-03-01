@@ -13,6 +13,7 @@ wheels/
 runs/*
 outputs/*
 lightning_logs/
+notebooks/
 
 # Jupyter
 .ipynb_checkpoints/
