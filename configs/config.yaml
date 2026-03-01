@@ -11,7 +11,7 @@ defaults:
 
 seed: 123
 run:
-  project: null              # required for cloud sync, e.g. run.project=grokking
+  project: ???               # required, e.g. run.project=grokking
   name: null                 # optional: override from CLI, e.g. run.name=exp1
   save_dir: runs
   ckpt_dir: checkpoints      # relative to run dir (your code can join these)
