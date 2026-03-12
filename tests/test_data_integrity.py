@@ -12,13 +12,13 @@ from __future__ import annotations
 
 import pytest
 
-from project.data.tokenize import build_shared_vocab, Vocab
-from project.data.modular import (
+from example.data.tokenize import build_shared_vocab, Vocab
+from example.data.modular import (
     ModularAdditionConfig,
     ModularAdditionDataset,
     FullModularAdditionDataset,
 )
-from project.data.dyck import DyckConfig, DyckNextTokenDataset
+from example.data.dyck import DyckConfig, DyckNextTokenDataset
 
 
 # ---------------------------------------------------------------------------

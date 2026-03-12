@@ -8,8 +8,8 @@ This module provides tools for understanding model internals:
 - viz: Lightweight visualization helpers
 
 Example workflow:
-    from project.models import TinyTransformer
-    from project.interp import head_ablation_sweep, train_probe
+    from example.models import TinyTransformer
+    from example.interp import head_ablation_sweep, train_probe
 
     model = TinyTransformer(vocab_size=100, d_model=64, n_layers=2, n_heads=4)
 
@@ -23,7 +23,7 @@ Example workflow:
     result = train_probe(cache["blocks.0.hook_resid_post"][:, -1], labels)
 """
 
-from project.interp.ablate import (
+from example.interp.ablate import (
     AblationResult,
     ablation_sweep,
     compute_component_importance,
@@ -32,7 +32,7 @@ from project.interp.ablate import (
     run_with_ablation,
     zero_ablation_hook,
 )
-from project.interp.patch import (
+from example.interp.patch import (
     PatchingResult,
     activation_patching,
     create_corrupted_input,
@@ -40,13 +40,13 @@ from project.interp.patch import (
     patching_hook,
     run_with_patch,
 )
-from project.interp.probes import (
+from example.interp.probes import (
     LinearProbe,
     ProbeResult,
     probe_all_layers,
     train_probe,
 )
-from project.interp.viz import (
+from example.interp.viz import (
     plot_ablation_results,
     plot_activation_norms,
     plot_attention_heads,

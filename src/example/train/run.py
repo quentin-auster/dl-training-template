@@ -18,7 +18,7 @@ from hydra.utils import instantiate
 
 from wonderwords import RandomWord
 
-from project.train.callbacks import RcloneSyncCallback, sync_to_cloud
+from example.train.callbacks import RcloneSyncCallback, sync_to_cloud
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ def _instantiate_logger(cfg: DictConfig) -> Optional[Logger]:
     return instantiate(cfg.logger)
 
 
-@hydra.main(version_base=None, config_path="../../../configs", config_name="config")
+@hydra.main(version_base=None, config_path="../../../configs/example", config_name="config")
 def main(cfg: DictConfig) -> None:
     # Make config visible in logs/artifacts
     OmegaConf.set_struct(cfg, False)

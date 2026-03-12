@@ -1,5 +1,5 @@
 # @package data
-_target_: project.data.DummyDataModule
+_target_: example.data.DummyDataModule
 batch_size: 64
 num_workers: 2
 n_train: 2048

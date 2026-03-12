@@ -34,7 +34,7 @@ uv run <command>
 The main training entrypoint is:
 
 ```bash
-uv run python -m project.train.run <hydra_overrides>
+uv run python -m example.train.run <hydra_overrides>
 ```
 
 For the default causal LM training setup in this repo, use:
@@ -46,7 +46,7 @@ For the default causal LM training setup in this repo, use:
 ### 1) Quick CPU sanity run
 
 ```bash
-uv run python -m project.train.run \
+uv run python -m example.train.run \
   model=causal_lm \
   data=modular \
   trainer=cpu \
@@ -64,7 +64,7 @@ uv run python -m project.train.run \
 Or explicitly:
 
 ```bash
-uv run python -m project.train.run \
+uv run python -m example.train.run \
   model=causal_lm \
   data=modular \
   trainer=mps \
@@ -81,7 +81,7 @@ uv run python -m project.train.run \
 Equivalent command:
 
 ```bash
-uv run python -m project.train.run \
+uv run python -m example.train.run \
   model=causal_lm \
   data=modular \
   trainer=gpu_1 \
@@ -127,7 +127,7 @@ Or pass Hydra overrides directly:
 
 ```bash
 docker run --gpus all training-template \
-  uv run python -m project.train.run \
+  uv run python -m example.train.run \
     model=causal_lm data=modular trainer=gpu_1 \
     trainer.max_epochs=2000
 ```
@@ -212,7 +212,7 @@ Each run syncs to `$RCLONE_DEST/<project>/run_artifacts/<run_name>/` both period
    ./scripts/train_gpu.sh logger=wandb logger.project=my-project
    ```
 
-The API key is loaded automatically from `.env` via `python-decouple` whenever `logger=wandb` is set. You can also update the default project name in `configs/logger/wandb.yaml`.
+The API key is loaded automatically from `.env` via `python-decouple` whenever `logger=wandb` is set. You can also update the default project name in `configs/example/logger/wandb.yaml`.
 
 You can combine both cloud sync and W&B:
 
@@ -227,7 +227,7 @@ For information on rclone client id setup, see [here](https://rclone.org/drive/#
 To resume a training run from a saved checkpoint, pass `run.ckpt_path`:
 
 ```bash
-uv run python -m project.train.run \
+uv run python -m example.train.run \
   model=causal_lm data=modular trainer=mps \
   trainer.max_epochs=3000 \
   run.ckpt_path=/path/to/last.ckpt
@@ -276,7 +276,7 @@ uv run tensorboard --logdir outputs/
 Override any config value from the CLI, for example:
 
 ```bash
-uv run python -m project.train.run \
+uv run python -m example.train.run \
   model=causal_lm \
   data=modular \
   trainer=gpu_1 \
@@ -301,11 +301,11 @@ Useful knobs:
 
 ## Project layout
 
-- `src/project/train/run.py`: Hydra + Lightning training entrypoint
-- `src/project/lit_causal_lm.py`: LightningModule for causal LM
-- `src/project/models/examples.py`: TinyTransformer with HookPoints
-- `src/project/data/lit_data.py`: modular addition DataModule
-- `src/project/interp/`: mechanistic interpretability tools (ablation, patching, probes, viz)
-- `src/project/utils/helpers.py`: QoL helpers (`load_checkpoint`, `auto_device`, `to_numpy`, etc.)
-- `configs/`: Hydra configs (trainer/model/data/logger/callbacks)
+- `src/example/train/run.py`: Hydra + Lightning training entrypoint
+- `src/example/lit_causal_lm.py`: LightningModule for causal LM
+- `src/example/models/examples.py`: TinyTransformer with HookPoints
+- `src/example/data/lit_data.py`: modular addition DataModule
+- `src/example/interp/`: mechanistic interpretability tools (ablation, patching, probes, viz)
+- `src/example/utils/helpers.py`: QoL helpers (`load_checkpoint`, `auto_device`, `to_numpy`, etc.)
+- `configs/example/`: Hydra configs (trainer/model/data/logger/callbacks)
 - `scripts/`: launch and setup scripts (`smoke_local.sh`, `train_gpu.sh`, `train_ddp.sh`, `setup_vm.sh`)

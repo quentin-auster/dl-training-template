@@ -1,6 +1,6 @@
 """Model architectures with TransformerLens HookPoints for interpretability."""
 
-from project.models.examples import (
+from example.models.examples import (
     Attention,
     MLP,
     TinyTransformer,

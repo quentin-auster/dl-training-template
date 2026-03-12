@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
-    from project.interp.ablate import AblationResult
-    from project.interp.patch import PatchingResult
+    from example.interp.ablate import AblationResult
+    from example.interp.patch import PatchingResult
 
 
 def plot_attention_pattern(

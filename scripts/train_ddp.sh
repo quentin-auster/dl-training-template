@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-uv run python -m project.train.run \
+uv run python -m example.train.run \
     data=modular \
     model=causal_lm \
     trainer=ddp \

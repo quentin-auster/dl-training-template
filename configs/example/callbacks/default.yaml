@@ -10,10 +10,10 @@
 - _target_: lightning.pytorch.callbacks.LearningRateMonitor
   logging_interval: "step"
 
-- _target_: project.train.callbacks.RcloneSyncCallback
+- _target_: example.train.callbacks.RcloneSyncCallback
   every_n_epochs: 200
 
-- _target_: project.train.callbacks.FourierLoggingCallback
+- _target_: example.train.callbacks.FourierLoggingCallback
   modulus: ${oc.select:data.modulus,null}
   every_n_epochs: 100
   n_top: 10

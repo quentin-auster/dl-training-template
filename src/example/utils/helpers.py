@@ -13,8 +13,8 @@ from torch import Tensor
 if TYPE_CHECKING:
     from torch.utils.data import Dataset
 
-    from project.lit_modules.lit_causal_lm import LitCausalLM
-    from project.models.examples import TinyTransformer
+    from example.lit_modules.lit_causal_lm import LitCausalLM
+    from example.models.examples import TinyTransformer
 
 
 def auto_device() -> str:
@@ -40,7 +40,7 @@ def load_checkpoint(
         A tuple of the Lightning module (in eval mode) and the underlying
         ``TinyTransformer``.
     """
-    from project.lit_modules.lit_causal_lm import LitCausalLM
+    from example.lit_modules.lit_causal_lm import LitCausalLM
 
     if device is None:
         device = auto_device()

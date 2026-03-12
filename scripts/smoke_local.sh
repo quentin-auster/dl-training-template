@@ -12,7 +12,7 @@ set -euo pipefail
 # Nanda grokking setup on MPS.
 # Grokking typically happens around epoch 1000-3000.
 # Use Ctrl-C to stop early; checkpoints are saved periodically.
-uv run python -m project.train.run \
+uv run python -m example.train.run \
     data=modular \
     model=causal_lm \
     trainer=mps \

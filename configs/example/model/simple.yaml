@@ -1,5 +1,5 @@
 # @package model
-_target_: project.lit_module.LitModel
+_target_: example.lit_module.LitModel
 # model hyperparams (example)
 input_dim: 32
 hidden_dim: 128

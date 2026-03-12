@@ -6,7 +6,7 @@ PyTorch Lightning + Hydra template for training small transformers, focused on m
 
 ```bash
 uv sync                          # install deps
-uv run python -m project.train.run trainer=cpu model=causal_lm data=modular logger=none trainer.max_epochs=1  # smoke test
+uv run python -m example.train.run trainer=cpu model=causal_lm data=modular logger=none trainer.max_epochs=1  # smoke test
 ./scripts/smoke_local.sh         # MPS smoke test (20 epochs)
 ./scripts/train_gpu.sh           # single CUDA GPU (1000 epochs, fp16)
 ./scripts/train_ddp.sh           # multi-GPU DDP (1000 epochs, bf16)
@@ -15,7 +15,7 @@ uv run python -m project.train.run trainer=cpu model=causal_lm data=modular logg
 
 ### Resuming a run
 ```bash
-uv run python -m project.train.run model=causal_lm data=modular trainer=mps \
+uv run python -m example.train.run model=causal_lm data=modular trainer=mps \
   run.ckpt_path=/path/to/last.ckpt trainer.max_epochs=3000
 ```
 Restores model weights, optimizer state, epoch counter, and LR scheduler from a Lightning checkpoint.
@@ -26,7 +26,7 @@ Restores model weights, optimizer state, epoch counter, and LR scheduler from a 
 - **Model**: `TinyTransformer` (HookedRootModule) wrapped by `LitCausalLM` (LightningModule)
 - **Interp**: TransformerLens hooks enable `model.run_with_cache()` and `model.run_with_hooks()`
 
-## Source map (`src/project/`)
+## Source map (`src/example/`)
 
 ### `lit_causal_lm.py`
 LitCausalLM — Lightning wrapper. Handles loss (cross_entropy, ignore_index=-100), accuracy on supervised positions, AdamW + linear warmup. Imports TinyTransformer from `models.examples`. Supports adaptive log frequency via `log_every_n_epochs_phase1` (default 10), `log_every_n_epochs_phase2` (default 100), `log_phase_boundary` (default 100) — metrics are only logged to W&B/TB on matching epochs, which also gates ModelCheckpoint saves. Console output is always emitted.
@@ -60,7 +60,7 @@ TinyTransformer (HookedRootModule), Attention, MLP, TransformerBlock — all wit
 - `to_numpy(tensor)` — `.detach().cpu().float().numpy()`
 - `make_batch(dataset, n, collate_fn, device)` → dict of tensors
 
-## Configs (`configs/`)
+## Configs (`configs/example/`)
 
 - `config.yaml` — defaults: model=simple, data=dummy, optim=adamw, trainer=cpu, logger=tensorboard, callbacks=default
 - `model/causal_lm.yaml` — Nanda grokking: 1 layer, 4 heads, d_model=128, d_mlp=512, ReLU, no LN, untied embeds, lr=1e-3, wd=1.0
